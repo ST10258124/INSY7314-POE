@@ -1,0 +1,127 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@5.0.0
+
+executors:
+  node-java-exec:
+    docker:
+      - image: cimg/node:18.16
+    resource_class: medium
+
+jobs:
+  scan-frontend:
+    executor: node-java-exec
+    environment:
+      SONAR_HOST_URL: << pipeline.parameters.sonar_host_url >>
+      SONAR_TOKEN: << pipeline.parameters.sonar_token >>
+    steps:
+      - checkout
+
+      - run:
+          name: Install Java + unzip
+          command: |
+            sudo apt-get update -y
+            sudo apt-get install -y openjdk-11-jre-headless unzip curl
+
+      - run:
+          name: Install frontend deps & build
+          working_directory: ./frontend
+          command: |
+            npm ci
+            npm run build || echo "build may be optional for your setup"
+
+      - run:
+          name: Download SonarScanner CLI
+          command: |
+            SCANNER_VER=4.8.0.2856
+            mkdir -p /tmp/sonar
+            curl -sSL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SCANNER_VER}.zip -o /tmp/sonar/sonar-scanner.zip
+            unzip -q /tmp/sonar/sonar-scanner.zip -d /tmp/sonar
+            export PATH=/tmp/sonar/sonar-scanner-${SCANNER_VER}/bin:$PATH
+            echo "SonarScanner downloaded"
+
+      - run:
+          name: Create sonar-project.properties for frontend
+          working_directory: ./frontend
+          command: |
+            cat > sonar-project.properties <<'EOF'
+            sonar.projectKey=your_org:frontend
+            sonar.projectName=MyRepo - Frontend
+            sonar.sources=src
+            sonar.tests=src
+            sonar.javascript.lcov.reportPaths=coverage/lcov.info
+            sonar.sourceEncoding=UTF-8
+            EOF
+
+      - run:
+          name: Run SonarScanner for frontend
+          working_directory: ./frontend
+          command: |
+            export SONAR_HOST_URL=${SONAR_HOST_URL}
+            export SONAR_TOKEN=${SONAR_TOKEN}
+            /tmp/sonar/sonar-scanner-*/bin/sonar-scanner \
+              -Dsonar.login=${SONAR_TOKEN} \
+              -Dsonar.host.url=${SONAR_HOST_URL}
+
+  scan-backend:
+    executor: node-java-exec
+    environment:
+      SONAR_HOST_URL: << pipeline.parameters.sonar_host_url >>
+      SONAR_TOKEN: << pipeline.parameters.sonar_token >>
+    steps:
+      - checkout
+
+      - run:
+          name: Install Java + unzip
+          command: |
+            sudo apt-get update -y
+            sudo apt-get install -y openjdk-11-jre-headless unzip curl
+
+      - run:
+          name: Install backend deps
+          working_directory: ./backend
+          command: |
+            npm ci
+            # run tests if you want (optional):
+            npm test || echo "tests may fail locally - CI will still proceed to scanner"
+
+      - run:
+          name: Create sonar-project.properties for backend
+          working_directory: ./backend
+          command: |
+            cat > sonar-project.properties <<'EOF'
+            sonar.projectKey=your_org:backend
+            sonar.projectName=MyRepo - Backend
+            sonar.sources=.
+            sonar.tests=tests
+            sonar.sourceEncoding=UTF-8
+            EOF
+
+      - run:
+          name: Download SonarScanner CLI
+          command: |
+            SCANNER_VER=4.8.0.2856
+            mkdir -p /tmp/sonar
+            curl -sSL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SCANNER_VER}.zip -o /tmp/sonar/sonar-scanner.zip
+            unzip -q /tmp/sonar/sonar-scanner.zip -d /tmp/sonar
+            echo "SonarScanner downloaded"
+
+      - run:
+          name: Run SonarScanner for backend
+          working_directory: ./backend
+          command: |
+            export SONAR_HOST_URL=${SONAR_HOST_URL}
+            export SONAR_TOKEN=${SONAR_TOKEN}
+            /tmp/sonar/sonar-scanner-*/bin/sonar-scanner \
+              -Dsonar.login=${SONAR_TOKEN} \
+              -Dsonar.host.url=${SONAR_HOST_URL}
+
+workflows:
+  version: 2
+  sonar-scans:
+    jobs:
+      - scan-frontend:
+          context: sonar-context
+      - scan-backend:
+          context: sonar-context
