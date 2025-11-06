@@ -1,6 +1,6 @@
 # Introduction
 
-This application is visual code application that will allow the users to login and logout. The user will also be able to register on the application and once logged in they will be able to make payments to through the application .
+This application is visual code application that will allow the users to login and logout. The user will also be able to register on the application and once logged in they will be able to make payments to through the application. The employyes will have access to the patments in the system and will be able to approve them if needed.
 
 
 
@@ -31,6 +31,8 @@ This application is visual code application that will allow the users to login a
 
 
 -You will click the button and this will take you to the payments page and here you will need to enter your debit/credit card details which are , your full name , card number ( Must start with 4 and be 16 digits long) , expiry date ,the cvv number , bill address , city and the postal code , you will then make the payment by clicking the submit payment button and you will get a conformation message after at the top of the page.
+
+FOR the employee portal:
 
 
 
@@ -63,6 +65,8 @@ Answer- Yes, the user can login and logout
 3.Question- Can the user make a payment on the application
 Answer - Yes the use can make a payment on the application
 
+3.Question- Can the employee make a approve payments
+Answer - Yes the use can approve a payment on the application
 
 
 # Credits(author Information)
@@ -81,12 +85,12 @@ Devesh Gokul - ST10375204 - Contact: (Email) ST10375204@vcconnect.edu.za
 
 # GitHub Link
 
-https://github.com/VCWVL/insy7314-part-2-ST10258124
+
 
 
 
 # YouTube link
-https://youtu.be/pkg2DSRpLaE
+
 
 
 
