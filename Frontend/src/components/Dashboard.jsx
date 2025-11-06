@@ -1,0 +1,19 @@
+import { useEffect, useState } from "react";
+import API from "../services/api";
+
+export default function Dashboard() {
+  const [me, setMe] = useState(null);
+  const [err, setErr] = useState("");
+
+  return (
+    <div style={{ padding: 16 }}>
+      <p>Dashboard</p>
+      {err && <p style={{ color: "red" }}>{err}</p>}
+      {me ? (
+        <pre>{JSON.stringify(me, null, 2)}</pre>
+      ) : (
+        <p>Loading your info...</p>
+      )}
+    </div>
+  );
+}
