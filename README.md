@@ -1,4 +1,4 @@
-# Introduction
+ # Introduction
 
 This application is visual code application that will allow the users to login and logout. The user will also be able to register on the application and once logged in they will be able to make payments to through the application. The employyes will have access to the patments in the system and will be able to approve them if needed.
 
@@ -41,6 +41,7 @@ FOR the employee portal:
 * The user can login and logout of the application.
 * The user can register on the application.
 * The user can make payments through the system.
+* The 
 
 
 
