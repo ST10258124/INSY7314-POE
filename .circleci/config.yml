@@ -10,32 +10,34 @@ executors:
     resource_class: medium
 
 jobs:
-  scan-frontend:
+    scan-frontend:
     executor: node-java-exec
     steps:
       - checkout
 
       - run:
-          name: Diagnostics - show repo and env presence
+          name: Install Java 17 + unzip (and verify)
           command: |
-            echo "PWD: $(pwd)"
-            echo "Listing root:"
-            ls -la
-            echo "Listing Frontend (if present):"
-            ls -la Frontend || true
-            # print SONAR_HOST_URL and token length (do NOT print token contents)
-            echo "SONAR_HOST_URL = ${SONAR_HOST_URL:-<not set>}"
-            if [ -n "${SONAR_TOKEN:-}" ]; then
-              echo "SONAR_TOKEN length = ${#SONAR_TOKEN}"
-            else
-              echo "SONAR_TOKEN = <not set>"
+            sudo apt-get update -y
+            sudo apt-get install -y openjdk-17-jre-headless unzip curl
+            # confirm Java version
+            echo "---- java -version ----"
+            java -version || true
+            echo "---- which java ----"
+            which java || true
+            echo "---- JAVA_HOME (guessed) ----"
+            if [ -d /usr/lib/jvm/java-17-openjdk-amd64 ]; then
+              echo "/usr/lib/jvm/java-17-openjdk-amd64 exists"
+              export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
             fi
+            echo "JAVA_HOME=$JAVA_HOME"
+
 
       - run:
           name: Install Java + unzip
           command: |
             sudo apt-get update -y
-            sudo apt-get install -y openjdk-11-jre-headless unzip curl
+            sudo apt-get install -y openjdk-17-jre-headless unzip curl
 
       - run:
           name: Install frontend deps & build
@@ -98,7 +100,7 @@ jobs:
           name: Install Java + unzip
           command: |
             sudo apt-get update -y
-            sudo apt-get install -y openjdk-11-jre-headless unzip curl
+            sudo apt-get install -y openjdk-17-jre-headless unzip curl
 
       - run:
           name: Install backend deps
