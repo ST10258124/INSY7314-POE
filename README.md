@@ -22,6 +22,23 @@ This application is visual code application that will allow the users to login a
 
 -The user will run the backend of the application and the frontend of the application by opening the integrated the terminal for the frontend and back end folders. In the terminals type "npm run dev" and hit enter and on the frontend terminal click the link that will generate.
 
+-Please note there will be users on the sysetm already so you login as one of those users here are thier login details
+
+User 2:
+Email - user2@gmail.com
+Password - ABCdef123
+
+User 3:
+Email - user3@gmail.com
+Password - 123ABCdef
+
+User 4:
+Email - user4@gmail.com
+Password - DEFdef1234
+
+User 5:
+Email - user5@gmail.com
+Password - ABC123456
 
 
 -The link will take you to the home page that will a navigation bar. The navigation bar will have a login and register button.
