@@ -22,6 +22,7 @@ jobs:
             ls -la
             ls -la Frontend || true
             echo "SONAR_HOST_URL=${SONAR_HOST_URL:-<not set>}"
+            echo "SONAR_ORG=${SONAR_ORG:-<not set>}"
             if [ -n "${SONAR_TOKEN:-}" ]; then echo "SONAR_TOKEN length=${#SONAR_TOKEN}"; else echo "SONAR_TOKEN=<not set>"; fi
 
       - run:
@@ -75,7 +76,8 @@ jobs:
             export PATH=/tmp/sonar/sonar-scanner-*/bin:$PATH
             /tmp/sonar/sonar-scanner-*/bin/sonar-scanner \
               -Dsonar.login="${SONAR_TOKEN}" \
-              -Dsonar.host.url="${SONAR_HOST_URL}"
+              -Dsonar.host.url="${SONAR_HOST_URL}" \
+              -Dsonar.organization="${SONAR_ORG}"
 
   scan-backend:
     executor: node-java-exec
@@ -89,6 +91,7 @@ jobs:
             ls -la
             ls -la Backend || true
             echo "SONAR_HOST_URL=${SONAR_HOST_URL:-<not set>}"
+            echo "SONAR_ORG=${SONAR_ORG:-<not set>}"
             if [ -n "${SONAR_TOKEN:-}" ]; then echo "SONAR_TOKEN length=${#SONAR_TOKEN}"; else echo "SONAR_TOKEN=<not set>"; fi
 
       - run:
@@ -96,7 +99,9 @@ jobs:
           command: |
             sudo apt-get update -y
             sudo apt-get install -y openjdk-17-jre-headless unzip curl
+            echo "---- java -version ----"
             java -version || true
+            echo "---- which java ----"
             which java || true
             if [ -d /usr/lib/jvm/java-17-openjdk-amd64 ]; then
               export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
@@ -110,29 +115,28 @@ jobs:
             npm ci
             npm test || echo "backend tests optional"
 
-            - run:
+      - run:
           name: Create sonar-project.properties for backend (safe)
           working_directory: ./Backend
           command: |
             if [ -d tests ]; then
               printf '%s\n' \
                 "sonar.projectKey=ST10258124_INSY7314-POE" \
-                "sonar.organization=${SONAR_ORG}" \
                 "sonar.projectName=INSY7314-POE" \
+                "sonar.organization=${SONAR_ORG}" \
                 "sonar.sources=." \
                 "sonar.tests=tests" \
                 "sonar.sourceEncoding=UTF-8" > sonar-project.properties
             else
               printf '%s\n' \
                 "sonar.projectKey=ST10258124_INSY7314-POE" \
-                "sonar.organization=${SONAR_ORG}" \
                 "sonar.projectName=INSY7314-POE" \
+                "sonar.organization=${SONAR_ORG}" \
                 "sonar.sources=." \
                 "sonar.sourceEncoding=UTF-8" > sonar-project.properties
             fi
             echo "Wrote Backend/sonar-project.properties:"
             sed -n '1,120p' sonar-project.properties || true
-
 
       - run:
           name: Download SonarScanner CLI
@@ -150,7 +154,8 @@ jobs:
             export PATH=/tmp/sonar/sonar-scanner-*/bin:$PATH
             /tmp/sonar/sonar-scanner-*/bin/sonar-scanner \
               -Dsonar.login="${SONAR_TOKEN}" \
-              -Dsonar.host.url="${SONAR_HOST_URL}"
+              -Dsonar.host.url="${SONAR_HOST_URL}" \
+              -Dsonar.organization="${SONAR_ORG}"
 
 workflows:
   version: 2
