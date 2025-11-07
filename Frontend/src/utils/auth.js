@@ -24,3 +24,5 @@ export const isTokenValid = () => {
 };
 
 export const isLoggedIn = () => !!getToken() && isTokenValid();
+
+

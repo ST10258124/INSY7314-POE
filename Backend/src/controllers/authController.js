@@ -4,6 +4,28 @@ const jwt = require("jsonwebtoken");
 // --- in-memory "database" ---
 const users = []; // { id, email, password (hashed), role }
 
+// --- seed admin user ---
+(async () => {
+  const bcrypt = require("bcrypt");
+
+  const adminEmail = "admin@gmail.com";
+  const adminPassword = "Admin12345!"; 
+
+  const hashedPassword = await bcrypt.hash(adminPassword, 12);
+
+  users.push({
+    id: 1,
+    email: adminEmail,
+    password: hashedPassword,
+    role: "admin",
+    createdAt: new Date(),
+  });
+
+  console.log(` Admin user seeded: ${adminEmail} / ${adminPassword}`);
+})();
+
+
+
 const JWT_SECRET = process.env.JWT_SECRET || "dev_secret_key"; // fallback for dev
 const JWT_EXPIRES = "2h"; // or "1d"
 

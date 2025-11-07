@@ -16,13 +16,14 @@ app.set("trust proxy", 1);
 
 helmet(app);
 app.use(cors({
-  origin: ["http://localhost:5173", "https://localhost:5173"], // match your FE
+  origin: ["http://localhost:5173", "https://localhost:5173"], 
   credentials: true
 }));
 app.use(express.json());
 
 // routes
 const authRoutes = require("./routes/authRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
 
 // 👇 apply limiters only where abuse happens
 // (If you already added them inside authRoutes, skip these lines.)
@@ -32,7 +33,9 @@ app.use("/api/auth/register-admin", registerLimiter);
 
 // mount routers
 app.use("/api/auth", authRoutes);
-
+/////////////////////////////////////////////////////////////////////////////
+// Register the route
+app.use("/api/payments", paymentRoutes);
 
 // DEV: robust route inspector (handles nested routers + mounts)
 app.get("/__routes", (req, res) => {

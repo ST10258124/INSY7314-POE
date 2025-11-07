@@ -82,4 +82,6 @@ router.stack
     console.log("[authRoutes] route:", Object.keys(l.route.methods), l.route.path)
   );
 
+
+  
 module.exports = router;

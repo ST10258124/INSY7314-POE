@@ -17,6 +17,7 @@ const protect = (req, res, next) => {
   }
 };
 
+
 // Ownership check for resources with { author } and optional { status }
 const requireOwnership = (Model) => async (req, res, next) => {
   try {
@@ -38,5 +39,15 @@ const requireOwnership = (Model) => async (req, res, next) => {
   }
 };
 
+// Middleware to restrict access to admins only
+const admin = (req, res, next) => {
+  if (!req.user || req.user.role !== "admin") {
+    return res.status(403).json({ message: "Forbidden: admin only" });
+  }
+  next();
+};
+
+module.exports = { protect, requireOwnership, admin };
+
 // 2) Export once, consistently
-module.exports = { protect, requireOwnership };
+//module.exports = { protect, requireOwnership };

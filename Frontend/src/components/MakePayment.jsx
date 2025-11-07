@@ -1,4 +1,5 @@
 import { useState } from "react";
+import api from "../services/api"; //import your backend connection
 import {
   isValidCardNumber,
   isValidExpiry,
@@ -19,11 +20,12 @@ export default function PaymentForm() {
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
-    setErrors({ ...errors, [name]: "" }); // clear field error when editing
+    setErrors({ ...errors, [name]: "" });
   };
 
   const validateFields = () => {
@@ -40,12 +42,32 @@ export default function PaymentForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!validateFields()) return;
-    console.log("Payment submitted:", form);
-    alert("Payment submitted successfully! (Mock)");
-  };
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!validateFields()) return;
+
+  try {
+    setLoading(true);
+    const res = await api.post("/payments", form);
+    console.log("✅ Payment submitted:", res.data.payment); // 👈 shows what backend saved
+    alert("Payment submitted successfully! Awaiting admin approval.");
+    setForm({
+      nameOnCard: "",
+      cardNumber: "",
+      expiry: "",
+      cvv: "",
+      billingAddress: "",
+      city: "",
+      postalCode: "",
+    });
+  } catch (err) {
+    console.error(err);
+    alert(err.response?.data?.message || "Failed to submit payment.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div
@@ -61,100 +83,57 @@ export default function PaymentForm() {
       <h2 style={{ textAlign: "center", marginBottom: 20 }}>Payment Information</h2>
 
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {/* Name on Card */}
         <div>
           <label>Name on Card:</label>
-          <input
-            name="nameOnCard"
-            value={form.nameOnCard}
-            onChange={handleChange}
-            className="input"
-          />
+          <input name="nameOnCard" value={form.nameOnCard} onChange={handleChange} className="input" />
           {errors.nameOnCard && <p style={{ color: "red", fontSize: 13 }}>{errors.nameOnCard}</p>}
         </div>
 
-        {/* Card Number */}
         <div>
           <label>Card Number:</label>
-          <input
-            name="cardNumber"
-            value={form.cardNumber}
-            onChange={handleChange}
-            maxLength={16}
-            className="input"
-          />
+          <input name="cardNumber" value={form.cardNumber} onChange={handleChange} maxLength={16} className="input" />
           {errors.cardNumber && <p style={{ color: "red", fontSize: 13 }}>{errors.cardNumber}</p>}
         </div>
 
-        {/* Expiry + CVV side by side */}
         <div style={{ display: "flex", gap: 12 }}>
           <div style={{ flex: 1 }}>
             <label>Expiry (MM/YY):</label>
-            <input
-              name="expiry"
-              value={form.expiry}
-              onChange={handleChange}
-              placeholder="MM/YY"
-              className="input"
-            />
+            <input name="expiry" value={form.expiry} onChange={handleChange} placeholder="MM/YY" className="input" />
             {errors.expiry && <p style={{ color: "red", fontSize: 13 }}>{errors.expiry}</p>}
           </div>
 
           <div style={{ width: "48%" }}>
             <label>CVV:</label>
-            <input
-              name="cvv"
-              value={form.cvv}
-              onChange={handleChange}
-              maxLength={3}
-              className="input"
-            />
+            <input name="cvv" value={form.cvv} onChange={handleChange} maxLength={3} className="input" />
             {errors.cvv && <p style={{ color: "red", fontSize: 13 }}>{errors.cvv}</p>}
           </div>
         </div>
 
-        {/* Billing Address */}
         <div>
           <label>Billing Address:</label>
-          <input
-            name="billingAddress"
-            value={form.billingAddress}
-            onChange={handleChange}
-            className="input"
-          />
-          {errors.billingAddress && (
-            <p style={{ color: "red", fontSize: 13 }}>{errors.billingAddress}</p>
-          )}
+          <input name="billingAddress" value={form.billingAddress} onChange={handleChange} className="input" />
+          {errors.billingAddress && <p style={{ color: "red", fontSize: 13 }}>{errors.billingAddress}</p>}
         </div>
 
-        {/* City */}
         <div>
           <label>City:</label>
           <input name="city" value={form.city} onChange={handleChange} className="input" />
           {errors.city && <p style={{ color: "red", fontSize: 13 }}>{errors.city}</p>}
         </div>
 
-        {/* Postal Code */}
         <div>
           <label>Postal Code:</label>
-          <input
-            name="postalCode"
-            value={form.postalCode}
-            onChange={handleChange}
-            className="input"
-          />
-          {errors.postalCode && (
-            <p style={{ color: "red", fontSize: 13 }}>{errors.postalCode}</p>
-          )}
+          <input name="postalCode" value={form.postalCode} onChange={handleChange} className="input" />
+          {errors.postalCode && <p style={{ color: "red", fontSize: 13 }}>{errors.postalCode}</p>}
         </div>
 
-        {/* Submit Button */}
         <button
           type="submit"
+          disabled={loading}
           style={{
             marginTop: 16,
             padding: "10px 20px",
-            backgroundColor: "#007BFF",
+            backgroundColor: loading ? "#ccc" : "#007BFF",
             color: "#fff",
             border: "none",
             borderRadius: 6,
@@ -162,7 +141,7 @@ export default function PaymentForm() {
             fontSize: 16,
           }}
         >
-          Submit Payment
+          {loading ? "Submitting..." : "Submit Payment"}
         </button>
       </form>
     </div>

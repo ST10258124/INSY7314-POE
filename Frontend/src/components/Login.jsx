@@ -30,14 +30,32 @@ export default function Login() {
       return;
     }
 
+    //try {
+    //  const res = await api.post("/auth/login", { email, password });
+      //localStorage.setItem("token", res.data.token);
+    //  navigate("/home");
+   // } catch (err) {
+      //setError(err.response?.data?.message || "Login failed");
+   // }
+  //};
+  
     try {
-      const res = await api.post("/auth/login", { email, password });
-      localStorage.setItem("token", res.data.token);
+    const res = await api.post("/auth/login", { email, password });
+    const { token, user } = res.data; // ensureing backend sends role info
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+
+    // ✅ Redirect based on role
+    if (user.role === "admin") {
+      navigate("/payments");
+    } else {
       navigate("/home");
-    } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
     }
-  };
+  } catch (err) {
+    setError(err.response?.data?.message || "Login failed");
+  }
+};
 
   return (
     <div className="login-container">
