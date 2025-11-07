@@ -63,11 +63,12 @@ jobs:
             "sonar.projectName=INSY7314-POE" \
             "sonar.organization=${SONAR_ORG}" \
             "sonar.sources=src" \
-            "sonar.tests=src" \
+            "sonar.sourceEncoding=UTF-8" \
             "sonar.javascript.lcov.reportPaths=coverage/lcov.info" \
-            "sonar.sourceEncoding=UTF-8" > sonar-project.properties
+            "sonar.test.inclusions=src/**/*.test.js,src/**/*.spec.js,src/**/__tests__/**,src/**/*.test.jsx,src/**/*.spec.jsx" > sonar-project.properties
             echo "Wrote Frontend/sonar-project.properties:"
             sed -n '1,120p' sonar-project.properties || true
+
 
       - run:
           name: Run SonarScanner for frontend
