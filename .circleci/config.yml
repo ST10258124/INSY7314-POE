@@ -12,110 +12,151 @@ executors:
 jobs:
   scan-frontend:
     executor: node-java-exec
-    environment:
-      SONAR_HOST_URL: << pipeline.parameters.sonar_host_url >>
-      SONAR_TOKEN: << pipeline.parameters.sonar_token >>
     steps:
       - checkout
 
       - run:
-          name: Install Java + unzip
+          name: Diagnostics - repo & env
+          command: |
+            echo "PWD: $(pwd)"
+            ls -la
+            ls -la Frontend || true
+            echo "SONAR_HOST_URL=${SONAR_HOST_URL:-<not set>}"
+            echo "SONAR_ORG=${SONAR_ORG:-<not set>}"
+            if [ -n "${SONAR_TOKEN:-}" ]; then echo "SONAR_TOKEN length=${#SONAR_TOKEN}"; else echo "SONAR_TOKEN=<not set>"; fi
+
+      - run:
+          name: Install Java 17 + unzip (and verify)
           command: |
             sudo apt-get update -y
-            sudo apt-get install -y openjdk-11-jre-headless unzip curl
+            sudo apt-get install -y openjdk-17-jre-headless unzip curl
+            echo "---- java -version ----"
+            java -version || true
+            echo "---- which java ----"
+            which java || true
+            if [ -d /usr/lib/jvm/java-17-openjdk-amd64 ]; then
+              export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+              echo "Set JAVA_HOME=$JAVA_HOME"
+            fi
 
       - run:
           name: Install frontend deps & build
-          working_directory: ./frontend
+          working_directory: ./Frontend
           command: |
             npm ci
-            npm run build || echo "build may be optional for your setup"
+            npm run build || echo "frontend build optional"
 
       - run:
           name: Download SonarScanner CLI
           command: |
             SCANNER_VER=4.8.0.2856
             mkdir -p /tmp/sonar
-            curl -sSL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SCANNER_VER}.zip -o /tmp/sonar/sonar-scanner.zip
+            curl -sSL "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SCANNER_VER}.zip" -o /tmp/sonar/sonar-scanner.zip
             unzip -q /tmp/sonar/sonar-scanner.zip -d /tmp/sonar
-            export PATH=/tmp/sonar/sonar-scanner-${SCANNER_VER}/bin:$PATH
-            echo "SonarScanner downloaded"
+            echo "SonarScanner downloaded to /tmp/sonar"
 
       - run:
-          name: Create sonar-project.properties for frontend
-          working_directory: ./frontend
+          name: Create sonar-project.properties for frontend (safe)
+          working_directory: ./Frontend
           command: |
-            cat > sonar-project.properties <<'EOF'
-            sonar.projectKey=your_org:frontend
-            sonar.projectName=MyRepo - Frontend
-            sonar.sources=src
-            sonar.tests=src
-            sonar.javascript.lcov.reportPaths=coverage/lcov.info
-            sonar.sourceEncoding=UTF-8
-            EOF
+            printf '%s\n' "sonar.projectKey=ST10258124_INSY7314-POE" \
+            "sonar.projectName=INSY7314-POE" \
+            "sonar.organization=${SONAR_ORG}" \
+            "sonar.sources=src" \
+            "sonar.sourceEncoding=UTF-8" \
+            "sonar.javascript.lcov.reportPaths=coverage/lcov.info" \
+            "sonar.test.inclusions=src/**/*.test.js,src/**/*.spec.js,src/**/__tests__/**,src/**/*.test.jsx,src/**/*.spec.jsx" > sonar-project.properties
+            echo "Wrote Frontend/sonar-project.properties:"
+            sed -n '1,120p' sonar-project.properties || true
+
 
       - run:
           name: Run SonarScanner for frontend
-          working_directory: ./frontend
+          working_directory: ./Frontend
           command: |
-            export SONAR_HOST_URL=${SONAR_HOST_URL}
-            export SONAR_TOKEN=${SONAR_TOKEN}
+            export PATH=/tmp/sonar/sonar-scanner-*/bin:$PATH
             /tmp/sonar/sonar-scanner-*/bin/sonar-scanner \
-              -Dsonar.login=${SONAR_TOKEN} \
-              -Dsonar.host.url=${SONAR_HOST_URL}
+              -Dsonar.login="${SONAR_TOKEN}" \
+              -Dsonar.host.url="${SONAR_HOST_URL}" \
+              -Dsonar.organization="${SONAR_ORG}"
 
   scan-backend:
     executor: node-java-exec
-    environment:
-      SONAR_HOST_URL: << pipeline.parameters.sonar_host_url >>
-      SONAR_TOKEN: << pipeline.parameters.sonar_token >>
     steps:
       - checkout
 
       - run:
-          name: Install Java + unzip
+          name: Diagnostics - repo & env
+          command: |
+            echo "PWD: $(pwd)"
+            ls -la
+            ls -la Backend || true
+            echo "SONAR_HOST_URL=${SONAR_HOST_URL:-<not set>}"
+            echo "SONAR_ORG=${SONAR_ORG:-<not set>}"
+            if [ -n "${SONAR_TOKEN:-}" ]; then echo "SONAR_TOKEN length=${#SONAR_TOKEN}"; else echo "SONAR_TOKEN=<not set>"; fi
+
+      - run:
+          name: Install Java 17 + unzip (and verify)
           command: |
             sudo apt-get update -y
-            sudo apt-get install -y openjdk-11-jre-headless unzip curl
+            sudo apt-get install -y openjdk-17-jre-headless unzip curl
+            echo "---- java -version ----"
+            java -version || true
+            echo "---- which java ----"
+            which java || true
+            if [ -d /usr/lib/jvm/java-17-openjdk-amd64 ]; then
+              export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+              echo "Set JAVA_HOME=$JAVA_HOME"
+            fi
 
       - run:
           name: Install backend deps
-          working_directory: ./backend
+          working_directory: ./Backend
           command: |
             npm ci
-            # run tests if you want (optional):
-            npm test || echo "tests may fail locally - CI will still proceed to scanner"
+            npm test || echo "backend tests optional"
 
       - run:
-          name: Create sonar-project.properties for backend
-          working_directory: ./backend
+          name: Create sonar-project.properties for backend (safe)
+          working_directory: ./Backend
           command: |
-            cat > sonar-project.properties <<'EOF'
-            sonar.projectKey=your_org:backend
-            sonar.projectName=MyRepo - Backend
-            sonar.sources=.
-            sonar.tests=tests
-            sonar.sourceEncoding=UTF-8
-            EOF
+            if [ -d tests ]; then
+              printf '%s\n' \
+                "sonar.projectKey=ST10258124_INSY7314-POE" \
+                "sonar.projectName=INSY7314-POE" \
+                "sonar.organization=${SONAR_ORG}" \
+                "sonar.sources=." \
+                "sonar.tests=tests" \
+                "sonar.sourceEncoding=UTF-8" > sonar-project.properties
+            else
+              printf '%s\n' \
+                "sonar.projectKey=ST10258124_INSY7314-POE" \
+                "sonar.projectName=INSY7314-POE" \
+                "sonar.organization=${SONAR_ORG}" \
+                "sonar.sources=." \
+                "sonar.sourceEncoding=UTF-8" > sonar-project.properties
+            fi
+            echo "Wrote Backend/sonar-project.properties:"
+            sed -n '1,120p' sonar-project.properties || true
 
       - run:
           name: Download SonarScanner CLI
           command: |
             SCANNER_VER=4.8.0.2856
             mkdir -p /tmp/sonar
-            curl -sSL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SCANNER_VER}.zip -o /tmp/sonar/sonar-scanner.zip
+            curl -sSL "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SCANNER_VER}.zip" -o /tmp/sonar/sonar-scanner.zip
             unzip -q /tmp/sonar/sonar-scanner.zip -d /tmp/sonar
-            echo "SonarScanner downloaded"
+            echo "SonarScanner downloaded to /tmp/sonar"
 
       - run:
           name: Run SonarScanner for backend
-          working_directory: ./backend
+          working_directory: ./Backend
           command: |
-            export SONAR_HOST_URL=${SONAR_HOST_URL}
-            export SONAR_TOKEN=${SONAR_TOKEN}
+            export PATH=/tmp/sonar/sonar-scanner-*/bin:$PATH
             /tmp/sonar/sonar-scanner-*/bin/sonar-scanner \
-              -Dsonar.login=${SONAR_TOKEN} \
-              -Dsonar.host.url=${SONAR_HOST_URL}
+              -Dsonar.login="${SONAR_TOKEN}" \
+              -Dsonar.host.url="${SONAR_HOST_URL}" \
+              -Dsonar.organization="${SONAR_ORG}"
 
 workflows:
   version: 2
