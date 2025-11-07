@@ -20,8 +20,69 @@ const users = []; // { id, email, password (hashed), role }
     role: "admin",
     createdAt: new Date(),
   });
+  //===============================
 
-  console.log(` Admin user seeded: ${adminEmail} / ${adminPassword}`);
+const userTwoEmail = "user2@gmail.com";
+  const userTwoPassword = "ABCdef123"; 
+
+  const userTwohashedPassword = await bcrypt.hash(userOnePassword, 12);
+
+  users.push({
+    id: 1,
+    email: userTwoEmail,
+    password: userTwohashedPassword,
+    createdAt: new Date(),
+  });
+
+  console.log(` Admin user seeded: ${userTwoEmail} / ${userTwoPassword}`);
+
+  //===============================
+
+const userThreeEmail = "user3@gmail.com";
+  const userThreePassword = "ABCdef123"; 
+
+  const userThreehashedPassword = await bcrypt.hash(userThreePassword, 12);
+
+  users.push({
+    id: 1,
+    email: userThreeEmail,
+    password: userThreehashedPassword,
+    createdAt: new Date(),
+  });
+
+  console.log(` Admin user seeded: ${userThreeEmail} / ${userThreePassword}`);
+
+  //===============================
+
+const userFourEmail = "user4@gmail.com";
+  const userFourPassword = "ABCdef123"; 
+
+  const userFourhashedPassword = await bcrypt.hash(userFourPassword, 12);
+
+  users.push({
+    id: 1,
+    email: userFourEmail,
+    password: userFourhashedPassword,
+    createdAt: new Date(),
+  });
+
+  console.log(` Admin user seeded: ${userFourEmail} / ${userFourPassword}`);
+
+  //===============================
+
+const userFiveEmail = "user5@gmail.com";
+  const userFivePassword = "ABCdef123"; 
+
+  const userFivehashedPassword = await bcrypt.hash(userFivePassword, 12);
+
+  users.push({
+    id: 1,
+    email: userFiveEmail,
+    password: userFivehashedPassword,
+    createdAt: new Date(),
+  });
+
+  console.log(` Admin user seeded: ${userFiveEmail} / ${userFivePassword}`);
 })();
 
 
