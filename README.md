@@ -6,7 +6,9 @@ This application is visual code application that will allow the users to login a
 
 # Installation steps
 
--Ensure that you have visual Code installed on your laptop or desktop. -You can then proceed to download the source code from my GitHub repository on to your machine. -Once downloaded you can run the visual studio executable file in the project , this will open visual studio with and the programs code will be there.
+- Ensure that you have visual Code installed on your laptop or desktop.
+- You can then proceed to download the source code from my GitHub repository on to your machine. 
+- Once downloaded you can run the visual studio executable file in the project , this will open visual studio with and the programs code will be there.
 
 
 
@@ -32,8 +34,14 @@ This application is visual code application that will allow the users to login a
 
 -You will click the button and this will take you to the payments page and here you will need to enter your debit/credit card details which are , your full name , card number ( Must start with 4 and be 16 digits long) , expiry date ,the cvv number , bill address , city and the postal code , you will then make the payment by clicking the submit payment button and you will get a conformation message after at the top of the page.
 
+
 FOR the employee portal:
 
+- The employye will use this login details to log into the system:
+- Email- admin@gmail.com
+- Password - Admin12345!
+
+- The employee will see a paymnets page and they will be able to view all payments made by the users and either approve or reject them.
 
 
 # Functional-Requirements
@@ -41,7 +49,7 @@ FOR the employee portal:
 * The user can login and logout of the application.
 * The user can register on the application.
 * The user can make payments through the system.
-* The 
+* The employee can see all patments and approve or reject them
 
 
 
@@ -61,13 +69,13 @@ FOR the employee portal:
 Answer- Yes, the user can login and logout
 
 2. Question - Can the user register on the system
-   Answer - Yes, the user can register on the application
+Answer - Yes, the user can register on the application
 
 3.Question- Can the user make a payment on the application
 Answer - Yes the use can make a payment on the application
 
-3.Question- Can the employee make a approve payments
-Answer - Yes the use can approve a payment on the application
+4 .Question- Can the employee approve adn reject user payments
+Answer - Yes the use can approve or reject a payment on the application
 
 
 # Credits(author Information)
@@ -121,3 +129,8 @@ Babak (2019) How to run VS Code on the server!, DEV Community. Available at: htt
 
 Agmon, D. and Team, J. (2024) 10 malicious code examples you need to recognize to defend your SDLC, Jit. Available at: https://www.jit.io/resources/app-security/10-malicious-code-examples-you-need-to-recognize-to-defend-your-sdlc (Accessed: 08 October 2025).
 
+Singh, A. (2024) Setting up circleci for your project: A complete guide, Medium. Available at: https://medium.com/@anshumaansingh10jan/setting-up-circleci-for-your-project-a-complete-guide-84909a439bd5 (Accessed: 07 November 2025). 
+
+Thrive, M. (2024) Enhancing code quality: Integrating SonarQube into your circleci pipeline, Medium. Available at: https://mahira-technology.medium.com/enhancing-code-quality-integrating-sonarqube-into-your-circleci-pipeline-4928e9b41e11 (Accessed: 07 November 2025). 
+
+Sapkota, S. (2023) Elevating code quality: Ultimate guide to integrate SonarQube with circleci for effective code..., Medium. Available at: https://articles.readytowork.jp/elevating-code-quality-ultimate-guide-to-integrate-sonarqube-with-circleci-for-effective-code-2cd9fcedb9ee (Accessed: 07 November 2025). 
