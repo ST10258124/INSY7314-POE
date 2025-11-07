@@ -110,18 +110,29 @@ jobs:
             npm ci
             npm test || echo "backend tests optional"
 
-      - run:
+            - run:
           name: Create sonar-project.properties for backend (safe)
           working_directory: ./Backend
           command: |
-            printf '%s\n' "sonar.projectKey=ST10258124_INSY7314-POE" \
-            "sonar.projectName=INSY7314-POE" \
-            "sonar.organization=${SONAR_ORG}" \
-            "sonar.sources=." \
-            "sonar.tests=tests" \
-            "sonar.sourceEncoding=UTF-8" > sonar-project.properties
+            if [ -d tests ]; then
+              printf '%s\n' \
+                "sonar.projectKey=ST10258124_INSY7314-POE" \
+                "sonar.organization=${SONAR_ORG}" \
+                "sonar.projectName=INSY7314-POE" \
+                "sonar.sources=." \
+                "sonar.tests=tests" \
+                "sonar.sourceEncoding=UTF-8" > sonar-project.properties
+            else
+              printf '%s\n' \
+                "sonar.projectKey=ST10258124_INSY7314-POE" \
+                "sonar.organization=${SONAR_ORG}" \
+                "sonar.projectName=INSY7314-POE" \
+                "sonar.sources=." \
+                "sonar.sourceEncoding=UTF-8" > sonar-project.properties
+            fi
             echo "Wrote Backend/sonar-project.properties:"
             sed -n '1,120p' sonar-project.properties || true
+
 
       - run:
           name: Download SonarScanner CLI
