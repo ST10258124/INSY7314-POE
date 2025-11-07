@@ -25,7 +25,7 @@ const users = []; // { id, email, password (hashed), role }
 const userTwoEmail = "user2@gmail.com";
   const userTwoPassword = "ABCdef123"; 
 
-  const userTwohashedPassword = await bcrypt.hash(userOnePassword, 12);
+  const userTwohashedPassword = await bcrypt.hash(userTwoPassword, 12);
 
   users.push({
     id: 1,
@@ -39,7 +39,7 @@ const userTwoEmail = "user2@gmail.com";
   //===============================
 
 const userThreeEmail = "user3@gmail.com";
-  const userThreePassword = "ABCdef123"; 
+  const userThreePassword = "123ABCdef"; 
 
   const userThreehashedPassword = await bcrypt.hash(userThreePassword, 12);
 
@@ -55,7 +55,7 @@ const userThreeEmail = "user3@gmail.com";
   //===============================
 
 const userFourEmail = "user4@gmail.com";
-  const userFourPassword = "ABCdef123"; 
+  const userFourPassword = "DEFdef1234"; 
 
   const userFourhashedPassword = await bcrypt.hash(userFourPassword, 12);
 
@@ -71,7 +71,7 @@ const userFourEmail = "user4@gmail.com";
   //===============================
 
 const userFiveEmail = "user5@gmail.com";
-  const userFivePassword = "ABCdef123"; 
+  const userFivePassword = "ABC123456"; 
 
   const userFivehashedPassword = await bcrypt.hash(userFivePassword, 12);
 
